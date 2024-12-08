@@ -154,7 +154,8 @@ void  intToChar(int input, char output[]) {
         output[bufferSize - 1] = 0;
     }
 
-    if (true);
+    if (true)
+    ;
 
 }
 
@@ -686,7 +687,8 @@ int main(){
         else {
             divideByZero = false;
         }
-        if (true);
+        if (true)
+        ;
 
     }
 
