@@ -159,6 +159,87 @@ void  intToChar(int input, char output[]) {
 }
 
 
+// new char to float to handle decimal 
+double charToFloat(char input[]) {
+    double output = 0;
+    double decimalFactor = 0.1;
+    bool isDecimal = false;
+    bool negativeFound = false;
+
+    for (int i = 0; i < bufferSize && input[i] != '\0'; ++i) {
+        if (input[i] == '-') {
+            negativeFound = true;
+        } else if (input[i] == '.') {
+            isDecimal = true;
+        } else if (input[i] >= '0' && input[i] <= '9') {
+            int digit = input[i] - '0';
+            if (isDecimal) {
+                output += digit * decimalFactor;
+                decimalFactor *= 0.1;
+            } else {
+                output = output * 10 + digit;
+            }
+        }
+    }
+
+    if (negativeFound) {
+        output *= -1;
+    }
+
+    return output;
+}
+
+// new float to char to help handle decimal
+void floatToChar(double input, char output[]) {
+    int index = 0;
+    bool negativeFound = false;
+
+    // Handle negative numbers
+    if (input < 0) {
+        negativeFound = true;
+        input = -input;
+        output[index++] = '-';
+    }
+
+    // Extract the integer part
+    int integerPart = (int)input;
+    double fractionalPart = input - integerPart;
+
+    // Convert integer part
+    char integerBuffer[bufferSize] = {};
+    int intIndex = 0;
+    do {
+        integerBuffer[intIndex++] = '0' + (integerPart % 10);
+        integerPart /= 10;
+    } while (integerPart > 0);
+
+    // Reverse the integer part to correct order
+    while (intIndex > 0) {
+        output[index++] = integerBuffer[--intIndex];
+    }
+
+    // Convert fractional part if present
+    if (fractionalPart > 0) {
+        output[index++] = '.';
+        for (int i = 0; i < 6; ++i) { // Limit to 6 decimal places
+            fractionalPart *= 10;
+            int digit = (int)fractionalPart;
+            output[index++] = '0' + digit;
+            fractionalPart -= digit;
+
+            if (fractionalPart == 0) {
+                break;
+            }
+        }
+    }
+
+    output[index] = '\0';
+}
+
+
+
+
+
 //determine whether or not the input is valid
 //input char[]
 //output bool
@@ -461,7 +542,7 @@ int power(int left, int right) {
 
 int solve(char input[][bufferSize]);
 
-void paraSearch(char input[][bufferSize]) {
+/*void paraSearch(char input[][bufferSize]) {
     while (true) {
         // Find the first opening parenthesis '('
         int leftmost = -1;
@@ -471,6 +552,8 @@ void paraSearch(char input[][bufferSize]) {
                 break;
             }
         }
+    
+        
 
         if (leftmost == -1) {
             break;
@@ -541,9 +624,105 @@ void paraSearch(char input[][bufferSize]) {
         }
     }
 }
+*/
+
+void paraSearch(char input[][bufferSize]) {
+    while (true) {
+        // Find the first opening parenthesis '('
+        int leftmost = -1;
+        for (int i = 0; i < bufferSize; ++i) {
+            if (input[i][0] == '(') {
+                leftmost = i;
+                break;
+            }
+        }
+
+        if (leftmost == -1) {
+            break; // No more parentheses to process
+        }
+
+        // Check if the `(` is preceded by a `-` indicating a unary minus
+        if (leftmost > 0 && input[leftmost - 1][0] == '-') {
+            // Insert `-1` and `*` into the input
+            for (int j = bufferSize - 1; j > leftmost; --j) {
+                for (int k = 0; k < bufferSize; ++k) {
+                    input[j][k] = input[j - 2][k];
+                }
+            }
+            strcpy(input[leftmost - 1], "-1");
+            strcpy(input[leftmost], "*");
+            leftmost += 2;  // Adjust for inserted tokens
+        }
+
+        // Find the corresponding closing parenthesis ')'
+        int rightmost = -1;
+        for (int i = leftmost + 1; i < bufferSize; ++i) {
+            if (input[i][0] == ')') {
+                rightmost = i;
+                break;
+            }
+        }
+
+        // Extract the subexpression between parentheses
+        char subexpression[bufferSize][bufferSize] = {};
+        int subSize = 0;
+
+        for (int i = leftmost + 1; i < rightmost; ++i) {
+            for (int j = 0; j < bufferSize; ++j) {
+                subexpression[subSize][j] = input[i][j];
+            }
+            ++subSize;
+        }
+
+        // Solve the subexpression
+        int result = solve(subexpression);
+
+        // Replace the parenthesized subexpression with the result
+        char resultStr[bufferSize];
+        int temp = result;
+        int idx = 0;
+        if (temp < 0) {
+            resultStr[idx++] = '-';
+            temp = -temp;
+        }
+        char buffer[bufferSize] = {};
+        int bufferIdx = 0;
+        do {
+            buffer[bufferIdx++] = '0' + (temp % 10);
+            temp /= 10;
+        } while (temp > 0);
+        while (bufferIdx > 0) {
+            resultStr[idx++] = buffer[--bufferIdx];
+        }
+        resultStr[idx] = '\0';
+
+        for (int j = 0; j < bufferSize; ++j) {
+            input[leftmost][j] = resultStr[j];
+        }
+
+        // Mark the remaining tokens as empty
+        for (int i = leftmost + 1; i <= rightmost; ++i) {
+            input[i][0] = '\0';
+        }
+
+        // Compact the array to remove blanks
+        int writeIndex = 0;
+        for (int i = 0; i < bufferSize; ++i) {
+            if (input[i][0] != '\0') {
+                if (writeIndex != i) {
+                    for (int j = 0; j < bufferSize; ++j) {
+                        input[writeIndex][j] = input[i][j];
+                        input[i][j] = '\0';
+                    }
+                }
+                ++writeIndex;
+            }
+        }
+    }
+}
 
 
-int solve(char input[][bufferSize]) {
+/*int solve(char input[][bufferSize]) {
     paraSearch(input);
     // Handle exponentiation (** operator)
     for (int i = 0; i < bufferSize && input[i][0] != '\0'; ++i) {
@@ -631,8 +810,129 @@ int solve(char input[][bufferSize]) {
         }
     }
 
+
     return charToInt(input[0]);
+} */
+
+
+// new solve to handle paren and decimal 
+int solve(char input[][bufferSize]) {
+    paraSearch(input);
+
+    // Handle unary negative at the beginning of the array
+    if (input[0][0] == '-' && input[1][0] != '\0') {
+        char tempInput[bufferSize][bufferSize] = {};
+        strcpy(tempInput[0], "-1");
+        strcpy(tempInput[1], "*");
+
+        // Shift the input to make space
+        for (int i = 0; i < bufferSize && input[i][0] != '\0'; ++i) {
+            strcpy(tempInput[i + 2], input[i]);
+        }
+
+        // Copy back to the original input
+        for (int i = 0; i < bufferSize; ++i) {
+            strcpy(input[i], tempInput[i]);
+        }
+    }
+
+    // Helper function to check if a value is floating-point
+    auto isFloatingPoint = [](char str[]) -> bool {
+        for (int i = 0; str[i] != '\0'; ++i) {
+            if (str[i] == '.') return true;
+        }
+        return false;
+    };
+
+    // Helper function to parse values dynamically
+    auto parseValue = [&](char str[]) -> double {
+        if (isFloatingPoint(str)) {
+            return charToFloat(str);
+        } else {
+            return charToInt(str);
+        }
+    };
+
+    // Helper function to convert results dynamically
+    auto formatResult = [&](double result, char output[]) {
+        if (result == (int)result) {
+            intToChar((int)result, output);
+        } else {
+            floatToChar(result, output);
+        }
+    };
+
+    // Helper function to update input array after operations
+    auto updateInputArray = [&](int index, double result) {
+        char resultStr[bufferSize];
+        formatResult(result, resultStr);
+        for (int j = 0; j < bufferSize; ++j) {
+            input[index - 1][j] = resultStr[j];
+        }
+        for (int k = index; k < bufferSize - 2; ++k) {
+            for (int j = 0; j < bufferSize; ++j) {
+                input[k][j] = input[k + 2][j];
+            }
+        }
+    };
+
+    // Handle exponentiation (** operator)
+    for (int i = 0; i < bufferSize && input[i][0] != '\0'; ++i) {
+        if (input[i][0] == '*' && input[i][1] == '*' && input[i][2] == '\0') {
+            double base = parseValue(input[i - 1]);
+            double exp = parseValue(input[i + 1]);
+            double result = power(base, exp);
+            updateInputArray(i, result);
+            i -= 1;
+        }
+    }
+
+    // Handle multiplication, division, and modulo
+    for (int i = 0; i < bufferSize && input[i][0] != '\0'; ++i) {
+        if (input[i][0] == '*' || input[i][0] == '/' || input[i][0] == '%') {
+            double lhs = parseValue(input[i - 1]);
+            double rhs = parseValue(input[i + 1]);
+            double result = 0;
+
+            if (input[i][0] == '*') {
+                result = multiply(lhs, rhs);
+            } else if (input[i][0] == '/') {
+                result = divide(lhs, rhs);
+            } else if (input[i][0] == '%') {
+                result = modulo((int)lhs, (int)rhs); // Modulo works only for integers
+            }
+
+            updateInputArray(i, result);
+            i -= 1;
+        }
+    }
+
+    // Handle addition and subtraction
+    for (int i = 0; i < bufferSize && input[i][0] != '\0'; ++i) {
+        if (input[i][0] == '+' || input[i][0] == '-') {
+            double lhs = parseValue(input[i - 1]);
+            double rhs = parseValue(input[i + 1]);
+            double result = 0;
+
+            if (input[i][0] == '+') {
+                result = add(lhs, rhs);
+            } else if (input[i][0] == '-') {
+                result = subtract(lhs, rhs);
+            }
+
+            updateInputArray(i, result);
+            i -= 1;
+        }
+    }
+
+    // Return the final result as an integer or float
+    if (isFloatingPoint(input[0])) {
+        return (int)charToFloat(input[0]); // Convert to int for compatibility
+    } else {
+        return charToInt(input[0]);
+    }
 }
+
 
 
 
