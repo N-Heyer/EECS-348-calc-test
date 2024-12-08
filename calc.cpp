@@ -727,6 +727,7 @@ void paraSearch(char input[][bufferSize]) {
 
 
 
+
 /*int solve(char input[][bufferSize]) {
     paraSearch(input);
     // Handle exponentiation (** operator)
