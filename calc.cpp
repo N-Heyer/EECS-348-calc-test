@@ -835,7 +835,7 @@ int solve(char input[][bufferSize]) {
         strcpy(tempInput[0], "-1");
         strcpy(tempInput[1], "*");
 
-        // Shift the input to make space
+        // Shift the input to make space for the unary minus handling
         for (int i = 0; i < bufferSize && input[i][0] != '\0'; ++i) {
             strcpy(tempInput[i + 2], input[i]);
         }
