@@ -8,7 +8,7 @@
 #include <iostream>
 using namespace std;
 
-const int bufferSize = 256;
+const int bufferSize = 30;
 bool divideByZero = false;
 
 //this function will get the input
@@ -154,91 +154,9 @@ void  intToChar(int input, char output[]) {
         output[bufferSize - 1] = 0;
     }
 
-    if (true)
-    ;
+    if (true);
 
 }
-
-
-// new char to float to handle decimal 
-double charToFloat(char input[]) {
-    double output = 0;
-    double decimalFactor = 0.1;
-    bool isDecimal = false;
-    bool negativeFound = false;
-
-    for (int i = 0; i < bufferSize && input[i] != '\0'; ++i) {
-        if (input[i] == '-') {
-            negativeFound = true;
-        } else if (input[i] == '.') {
-            isDecimal = true;
-        } else if (input[i] >= '0' && input[i] <= '9') {
-            int digit = input[i] - '0';
-            if (isDecimal) {
-                output += digit * decimalFactor;
-                decimalFactor *= 0.1;
-            } else {
-                output = output * 10 + digit;
-            }
-        }
-    }
-
-    if (negativeFound) {
-        output *= -1;
-    }
-
-    return output;
-}
-
-// new float to char to help handle decimal
-void floatToChar(double input, char output[]) {
-    int index = 0;
-    bool negativeFound = false;
-
-    // Handle negative numbers
-    if (input < 0) {
-        negativeFound = true;
-        input = -input;
-        output[index++] = '-';
-    }
-
-    // Extract the integer part
-    int integerPart = (int)input;
-    double fractionalPart = input - integerPart;
-
-    // Convert integer part
-    char integerBuffer[bufferSize] = {};
-    int intIndex = 0;
-    do {
-        integerBuffer[intIndex++] = '0' + (integerPart % 10);
-        integerPart /= 10;
-    } while (integerPart > 0);
-
-    // Reverse the integer part to correct order
-    while (intIndex > 0) {
-        output[index++] = integerBuffer[--intIndex];
-    }
-
-    // Convert fractional part if present
-    if (fractionalPart > 0) {
-        output[index++] = '.';
-        for (int i = 0; i < 6; ++i) { // Limit to 6 decimal places
-            fractionalPart *= 10;
-            int digit = (int)fractionalPart;
-            output[index++] = '0' + digit;
-            fractionalPart -= digit;
-
-            if (fractionalPart == 0) {
-                break;
-            }
-        }
-    }
-
-    output[index] = '\0';
-}
-
-
-
 
 
 //determine whether or not the input is valid
@@ -503,50 +421,39 @@ bool checkInputAndTokenize(char input[], char tokens[][bufferSize]) {
 }
 
 
-int divide(char* leftA, char* rightA){
-    int left = charToInt(leftA);
-    int right = charToInt(rightA);
-    if(right == 0) {
+int divide(int leftA, int rightA) {
+
+    if (rightA == 0) {
         divideByZero = true;
+        cout << "\nERROR: Divide by Zero\n";
         return 0;
     }
-    int result = left/right;
+    int result = leftA / rightA;
     return result;
 }
 
-int add(char* leftA, char* rightA){
-    int left = charToInt(leftA);
-    int right = charToInt(rightA);
-    return left+right;
+int add(int left, int right) {
+    return left + right;
 }
 
-int subtract(char* leftA, char* rightA){
-    int left = charToInt(leftA);
-    int right = charToInt(rightA);
-    return left-right;
+int subtract(int left, int right) {
+    return left - right;
 }
 
-int multiply(char* leftA, char* rightA){
-    int left = charToInt(leftA);
-    int right = charToInt(rightA);
-    return left*right;
+int multiply(int left, int right) {
+    return left * right;
 }
 
-int modulo(char* leftA, char* rightA){
-    int left = charToInt(leftA);
-    int right = charToInt(rightA);
-    std::cout << left << "\t" << right;
-    return left%right;
+int modulo(int left, int right) {
+    return left % right;
 }
 
-int power(char* leftA, char* rightA){
-    int left = charToInt(leftA);
-    int right = charToInt(rightA);
+int power(int left, int right) {
     //Base cases.
-    if(left == 0) return 0;
-    if(right == 0) return 1;
+    if (left == 0) return 0;
+    if (right == 0) return 1;
     int result = 1;
-    for(int i = 0; i < right; i++){
+    for (int i = 0; i < right; i++) {
         result *= left;
     }
     return result;
@@ -554,7 +461,7 @@ int power(char* leftA, char* rightA){
 
 int solve(char input[][bufferSize]);
 
-/*void paraSearch(char input[][bufferSize]) {
+void paraSearch(char input[][bufferSize]) {
     while (true) {
         // Find the first opening parenthesis '('
         int leftmost = -1;
@@ -564,8 +471,6 @@ int solve(char input[][bufferSize]);
                 break;
             }
         }
-    
-        
 
         if (leftmost == -1) {
             break;
@@ -636,111 +541,9 @@ int solve(char input[][bufferSize]);
         }
     }
 }
-*/
-
-void paraSearch(char input[][bufferSize]) {
-    while (true) {
-        // Find the first opening parenthesis '('
-        int leftmost = -1;
-        for (int i = 0; i < bufferSize; ++i) {
-            if (input[i][0] == '(') {
-                leftmost = i;
-                break;
-            }
-        }
-
-        if (leftmost == -1) {
-            break; // No more parentheses to process
-        }
-
-        // Find the corresponding closing parenthesis ')'
-        int rightmost = -1;
-        int openCount = 1; // Track nested parentheses
-        for (int i = leftmost + 1; i < bufferSize; ++i) {
-            if (input[i][0] == '(') {
-                openCount++;
-            } else if (input[i][0] == ')') {
-                openCount--;
-                if (openCount == 0) {
-                    rightmost = i;
-                    break;
-                }
-            }
-        }
-
-        if (rightmost == -1) {
-            printf("Error: Mismatched parentheses.\n");
-            return;
-        }
-
-        // Extract the subexpression between parentheses
-        char subexpression[bufferSize][bufferSize] = {};
-        int subSize = 0;
-
-        for (int i = leftmost + 1; i < rightmost; ++i) {
-            for (int j = 0; j < bufferSize; ++j) {
-                subexpression[subSize][j] = input[i][j];
-            }
-            ++subSize;
-        }
-
-        // Handle unary minus at the beginning of the subexpression
-        if (subexpression[0][0] == '-') {
-            char tempInput[bufferSize][bufferSize] = {};
-            strcpy(tempInput[0], "-1");
-            strcpy(tempInput[1], "*");
-
-            // Shift the subexpression to make space for the unary minus handling
-            for (int i = 0; i < subSize; ++i) {
-                strcpy(tempInput[i + 2], subexpression[i]);
-            }
-
-            // Copy back to the subexpression
-            for (int i = 0; i < bufferSize; ++i) {
-                strcpy(subexpression[i], tempInput[i]);
-            }
-        }
-
-        // Recursively solve the subexpression
-        paraSearch(subexpression);
-        int result = solve(subexpression);
-
-        // Replace the parenthesized subexpression with the result
-        char resultStr[bufferSize];
-        snprintf(resultStr, bufferSize, "%d", result);
-
-        for (int j = 0; j < bufferSize; ++j) {
-            input[leftmost][j] = resultStr[j];
-        }
-
-        // Mark the remaining tokens as empty
-        for (int i = leftmost + 1; i <= rightmost; ++i) {
-            input[i][0] = '\0';
-        }
-
-        // Compact the array to remove blanks
-        int writeIndex = 0;
-        for (int i = 0; i < bufferSize; ++i) {
-            if (input[i][0] != '\0') {
-                if (writeIndex != i) {
-                    for (int j = 0; j < bufferSize; ++j) {
-                        input[writeIndex][j] = input[i][j];
-                        input[i][j] = '\0';
-                    }
-                }
-                ++writeIndex;
-            }
-        }
-    }
-}
 
 
-
-
-
-
-
-/*int solve(char input[][bufferSize]) {
+int solve(char input[][bufferSize]) {
     paraSearch(input);
     // Handle exponentiation (** operator)
     for (int i = 0; i < bufferSize && input[i][0] != '\0'; ++i) {
@@ -828,129 +631,8 @@ void paraSearch(char input[][bufferSize]) {
         }
     }
 
-
     return charToInt(input[0]);
-} */
-
-
-// new solve to handle paren and decimal 
-int solve(char input[][bufferSize]) {
-    paraSearch(input);  // Ensure parentheses are handled first
-
-    // Handle unary negative at the beginning of the array
-    if (input[0][0] == '-' && input[1][0] != '\0') {
-        // Check if there's no value before the '-' and insert '-1 *' if necessary
-        char tempInput[bufferSize][bufferSize] = {};
-        strcpy(tempInput[0], "-1");
-        strcpy(tempInput[1], "*");
-
-        // Shift the input to make space for the unary minus handling
-        for (int i = 0; i < bufferSize && input[i][0] != '\0'; ++i) {
-            strcpy(tempInput[i + 2], input[i]);
-        }
-
-        // Copy back to the original input
-        for (int i = 0; i < bufferSize; ++i) {
-            strcpy(input[i], tempInput[i]);
-        }
-    }
-
-    // Helper function to convert values to strings for arithmetic functions
-    auto convertToString = [](double value, char str[]) {
-        if (value == (int)value) {
-            intToChar((int)value, str);  // Convert to int if it's a whole number
-        } else {
-            floatToChar(value, str);  // Otherwise convert to float
-        }
-    };
-
-    // Handle exponentiation (** operator)
-    for (int i = 0; i < bufferSize && input[i][0] != '\0'; ++i) {
-        if (input[i][0] == '*' && input[i][1] == '*' && input[i][2] == '\0') {
-            char resultStr[bufferSize];
-            char leftStr[bufferSize], rightStr[bufferSize];
-
-            double base = charToFloat(input[i - 1]);
-            double exp = charToFloat(input[i + 1]);
-
-            convertToString(base, leftStr);
-            convertToString(exp, rightStr);
-
-            int result = power(leftStr, rightStr); // Use existing function
-            intToChar(result, resultStr);
-
-            strcpy(input[i - 1], resultStr);
-            for (int k = i; k < bufferSize - 2; ++k) {
-                strcpy(input[k], input[k + 2]);
-            }
-            i -= 1; // Re-evaluate the current position
-        }
-    }
-
-    // Handle multiplication, division, and modulo
-    for (int i = 0; i < bufferSize && input[i][0] != '\0'; ++i) {
-        if (input[i][0] == '*' || input[i][0] == '/' || input[i][0] == '%') {
-            char resultStr[bufferSize];
-            char leftStr[bufferSize], rightStr[bufferSize];
-
-            double lhs = charToFloat(input[i - 1]);
-            double rhs = charToFloat(input[i + 1]);
-
-            convertToString(lhs, leftStr);
-            convertToString(rhs, rightStr);
-
-            int result = 0;
-            if (input[i][0] == '*') {
-                result = multiply(leftStr, rightStr);
-            } else if (input[i][0] == '/') {
-                result = divide(leftStr, rightStr);
-            } else if (input[i][0] == '%') {
-                result = modulo(leftStr, rightStr);
-            }
-
-            intToChar(result, resultStr);
-            strcpy(input[i - 1], resultStr);
-            for (int k = i; k < bufferSize - 2; ++k) {
-                strcpy(input[k], input[k + 2]);
-            }
-            i -= 1;
-        }
-    }
-
-    // Handle addition and subtraction
-    for (int i = 0; i < bufferSize && input[i][0] != '\0'; ++i) {
-        if (input[i][0] == '+' || input[i][0] == '-') {
-            char resultStr[bufferSize];
-            char leftStr[bufferSize], rightStr[bufferSize];
-
-            double lhs = charToFloat(input[i - 1]);
-            double rhs = charToFloat(input[i + 1]);
-
-            convertToString(lhs, leftStr);
-            convertToString(rhs, rightStr);
-
-            int result = 0;
-            if (input[i][0] == '+') {
-                result = add(leftStr, rightStr);
-            } else if (input[i][0] == '-') {
-                result = subtract(leftStr, rightStr);
-            }
-
-            intToChar(result, resultStr);
-            strcpy(input[i - 1], resultStr);
-            for (int k = i; k < bufferSize - 2; ++k) {
-                strcpy(input[k], input[k + 2]);
-            }
-            i -= 1;
-        }
-    }
-
-    // Return the final result as an integer
-    return charToInt(input[0]);  // Convert the final result to an integer
 }
-
-
-
 
 
 
@@ -993,8 +675,7 @@ int main(){
         else {
             divideByZero = false;
         }
-        if (true)
-        ;
+        if (true);
 
     }
 
