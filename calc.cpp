@@ -823,10 +823,11 @@ void paraSearch(char input[][bufferSize]) {
 
 // new solve to handle paren and decimal 
 int solve(char input[][bufferSize]) {
-    paraSearch(input);
+    paraSearch(input);  // Ensure parentheses are handled first
 
     // Handle unary negative at the beginning of the array
     if (input[0][0] == '-' && input[1][0] != '\0') {
+        // Check if there's no value before the '-' and insert '-1 *' if necessary
         char tempInput[bufferSize][bufferSize] = {};
         strcpy(tempInput[0], "-1");
         strcpy(tempInput[1], "*");
@@ -845,9 +846,9 @@ int solve(char input[][bufferSize]) {
     // Helper function to convert values to strings for arithmetic functions
     auto convertToString = [](double value, char str[]) {
         if (value == (int)value) {
-            intToChar((int)value, str);
+            intToChar((int)value, str);  // Convert to int if it's a whole number
         } else {
-            floatToChar(value, str);
+            floatToChar(value, str);  // Otherwise convert to float
         }
     };
 
@@ -870,7 +871,7 @@ int solve(char input[][bufferSize]) {
             for (int k = i; k < bufferSize - 2; ++k) {
                 strcpy(input[k], input[k + 2]);
             }
-            i -= 1;
+            i -= 1; // Re-evaluate the current position
         }
     }
 
@@ -933,8 +934,9 @@ int solve(char input[][bufferSize]) {
     }
 
     // Return the final result as an integer
-    return charToInt(input[0]);
+    return charToInt(input[0]);  // Convert the final result to an integer
 }
+
 
 
 
