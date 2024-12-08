@@ -688,9 +688,9 @@ void paraSearch(char input[][bufferSize]) {
         paraSearch(subexpression); // This will handle nested parentheses
         int result = solve(subexpression);
 
-        // If the subexpression was preceded by a unary minus, apply it
+        // If the subexpression was preceded by a unary minus, apply it to the result
         if (leftmost > 0 && input[leftmost - 1][0] == '-') {
-            result = -result; // Apply unary minus to the result
+            result = -result; // Apply unary minus to the result of the subexpression
         }
 
         // Replace the parenthesized subexpression with the result
@@ -721,6 +721,7 @@ void paraSearch(char input[][bufferSize]) {
         }
     }
 }
+
 
 
 
