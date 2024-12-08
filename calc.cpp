@@ -653,20 +653,6 @@ void paraSearch(char input[][bufferSize]) {
             break; // No more parentheses to process
         }
 
-        // Handle unary minus before the `(`
-        if (leftmost > 0 && input[leftmost - 1][0] == '-') {
-            // Shift elements to make space for `-1` and `*`
-            for (int j = bufferSize - 1; j > leftmost; --j) {
-                for (int k = 0; k < bufferSize; ++k) {
-                    input[j][k] = input[j - 2][k];
-                }
-            }
-            // Insert `-1` and `*`
-            strcpy(input[leftmost - 1], "-1");
-            strcpy(input[leftmost], "*");
-            leftmost += 2; // Adjust index for inserted tokens
-        }
-
         // Find the corresponding closing parenthesis ')'
         int rightmost = -1;
         int openCount = 1; // Track nested parentheses
@@ -687,7 +673,7 @@ void paraSearch(char input[][bufferSize]) {
             return;
         }
 
-        // Extract the subexpression
+        // Extract the subexpression between parentheses
         char subexpression[bufferSize][bufferSize] = {};
         int subSize = 0;
 
@@ -698,7 +684,8 @@ void paraSearch(char input[][bufferSize]) {
             ++subSize;
         }
 
-        // Solve the subexpression
+        // Solve the subexpression (recursively handles nested parentheses)
+        paraSearch(subexpression); // This will handle nested parentheses
         int result = solve(subexpression);
 
         // Replace the parenthesized subexpression with the result
@@ -729,6 +716,7 @@ void paraSearch(char input[][bufferSize]) {
         }
     }
 }
+
 
 
 
