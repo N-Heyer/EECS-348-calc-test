@@ -8,7 +8,7 @@
 #include <iostream>
 using namespace std;
 
-const int bufferSize = 30;
+const int bufferSize = 256;
 bool divideByZero = false;
 
 //this function will get the input
