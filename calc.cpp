@@ -421,39 +421,50 @@ bool checkInputAndTokenize(char input[], char tokens[][bufferSize]) {
 }
 
 
-int divide(int leftA, int rightA) {
-
-    if (rightA == 0) {
+int divide(char* leftA, char* rightA){
+    int left = charToInt(leftA);
+    int right = charToInt(rightA);
+    if(right == 0) {
         divideByZero = true;
-        cout << "\nERROR: Divide by Zero\n";
         return 0;
     }
-    int result = leftA / rightA;
+    int result = left/right;
     return result;
 }
 
-int add(int left, int right) {
-    return left + right;
+int add(char* leftA, char* rightA){
+    int left = charToInt(leftA);
+    int right = charToInt(rightA);
+    return left+right;
 }
 
-int subtract(int left, int right) {
-    return left - right;
+int subtract(char* leftA, char* rightA){
+    int left = charToInt(leftA);
+    int right = charToInt(rightA);
+    return left-right;
 }
 
-int multiply(int left, int right) {
-    return left * right;
+int multiply(char* leftA, char* rightA){
+    int left = charToInt(leftA);
+    int right = charToInt(rightA);
+    return left*right;
 }
 
-int modulo(int left, int right) {
-    return left % right;
+int modulo(char* leftA, char* rightA){
+    int left = charToInt(leftA);
+    int right = charToInt(rightA);
+    std::cout << left << "\t" << right;
+    return left%right;
 }
 
-int power(int left, int right) {
+int power(char* leftA, char* rightA){
+    int left = charToInt(leftA);
+    int right = charToInt(rightA);
     //Base cases.
-    if (left == 0) return 0;
-    if (right == 0) return 1;
+    if(left == 0) return 0;
+    if(right == 0) return 1;
     int result = 1;
-    for (int i = 0; i < right; i++) {
+    for(int i = 0; i < right; i++){
         result *= left;
     }
     return result;
