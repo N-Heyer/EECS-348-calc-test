@@ -684,14 +684,26 @@ void paraSearch(char input[][bufferSize]) {
             ++subSize;
         }
 
-        // Solve the subexpression (recursively handles nested parentheses)
-        paraSearch(subexpression); // This will handle nested parentheses
-        int result = solve(subexpression);
+        // Handle unary minus at the beginning of the subexpression
+        if (subexpression[0][0] == '-') {
+            char tempInput[bufferSize][bufferSize] = {};
+            strcpy(tempInput[0], "-1");
+            strcpy(tempInput[1], "*");
 
-        // If the subexpression was preceded by a unary minus, apply it to the result
-        if (leftmost > 0 && input[leftmost - 1][0] == '-') {
-            result = -result; // Apply unary minus to the result of the subexpression
+            // Shift the subexpression to make space for the unary minus handling
+            for (int i = 0; i < subSize; ++i) {
+                strcpy(tempInput[i + 2], subexpression[i]);
+            }
+
+            // Copy back to the subexpression
+            for (int i = 0; i < bufferSize; ++i) {
+                strcpy(subexpression[i], tempInput[i]);
+            }
         }
+
+        // Recursively solve the subexpression
+        paraSearch(subexpression);
+        int result = solve(subexpression);
 
         // Replace the parenthesized subexpression with the result
         char resultStr[bufferSize];
