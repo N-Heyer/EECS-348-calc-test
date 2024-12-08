@@ -154,7 +154,8 @@ void  intToChar(int input, char output[]) {
         output[bufferSize - 1] = 0;
     }
 
-    if (true);
+    if (true)
+    ;
 
 }
 
@@ -502,39 +503,50 @@ bool checkInputAndTokenize(char input[], char tokens[][bufferSize]) {
 }
 
 
-int divide(int leftA, int rightA) {
-
-    if (rightA == 0) {
+int divide(char* leftA, char* rightA){
+    int left = charToInt(leftA);
+    int right = charToInt(rightA);
+    if(right == 0) {
         divideByZero = true;
-        cout << "\nERROR: Divide by Zero\n";
         return 0;
     }
-    int result = leftA / rightA;
+    int result = left/right;
     return result;
 }
 
-int add(int left, int right) {
-    return left + right;
+int add(char* leftA, char* rightA){
+    int left = charToInt(leftA);
+    int right = charToInt(rightA);
+    return left+right;
 }
 
-int subtract(int left, int right) {
-    return left - right;
+int subtract(char* leftA, char* rightA){
+    int left = charToInt(leftA);
+    int right = charToInt(rightA);
+    return left-right;
 }
 
-int multiply(int left, int right) {
-    return left * right;
+int multiply(char* leftA, char* rightA){
+    int left = charToInt(leftA);
+    int right = charToInt(rightA);
+    return left*right;
 }
 
-int modulo(int left, int right) {
-    return left % right;
+int modulo(char* leftA, char* rightA){
+    int left = charToInt(leftA);
+    int right = charToInt(rightA);
+    std::cout << left << "\t" << right;
+    return left%right;
 }
 
-int power(int left, int right) {
+int power(char* leftA, char* rightA){
+    int left = charToInt(leftA);
+    int right = charToInt(rightA);
     //Base cases.
-    if (left == 0) return 0;
-    if (right == 0) return 1;
+    if(left == 0) return 0;
+    if(right == 0) return 1;
     int result = 1;
-    for (int i = 0; i < right; i++) {
+    for(int i = 0; i < right; i++){
         result *= left;
     }
     return result;
@@ -641,29 +653,41 @@ void paraSearch(char input[][bufferSize]) {
             break; // No more parentheses to process
         }
 
-        // Check if the `(` is preceded by a `-` indicating a unary minus
+        // Handle unary minus before the `(`
         if (leftmost > 0 && input[leftmost - 1][0] == '-') {
-            // Insert `-1` and `*` into the input
+            // Shift elements to make space for `-1` and `*`
             for (int j = bufferSize - 1; j > leftmost; --j) {
                 for (int k = 0; k < bufferSize; ++k) {
                     input[j][k] = input[j - 2][k];
                 }
             }
+            // Insert `-1` and `*`
             strcpy(input[leftmost - 1], "-1");
             strcpy(input[leftmost], "*");
-            leftmost += 2;  // Adjust for inserted tokens
+            leftmost += 2; // Adjust index for inserted tokens
         }
 
         // Find the corresponding closing parenthesis ')'
         int rightmost = -1;
+        int openCount = 1; // Track nested parentheses
         for (int i = leftmost + 1; i < bufferSize; ++i) {
-            if (input[i][0] == ')') {
-                rightmost = i;
-                break;
+            if (input[i][0] == '(') {
+                openCount++;
+            } else if (input[i][0] == ')') {
+                openCount--;
+                if (openCount == 0) {
+                    rightmost = i;
+                    break;
+                }
             }
         }
 
-        // Extract the subexpression between parentheses
+        if (rightmost == -1) {
+            printf("Error: Mismatched parentheses.\n");
+            return;
+        }
+
+        // Extract the subexpression
         char subexpression[bufferSize][bufferSize] = {};
         int subSize = 0;
 
@@ -679,22 +703,7 @@ void paraSearch(char input[][bufferSize]) {
 
         // Replace the parenthesized subexpression with the result
         char resultStr[bufferSize];
-        int temp = result;
-        int idx = 0;
-        if (temp < 0) {
-            resultStr[idx++] = '-';
-            temp = -temp;
-        }
-        char buffer[bufferSize] = {};
-        int bufferIdx = 0;
-        do {
-            buffer[bufferIdx++] = '0' + (temp % 10);
-            temp /= 10;
-        } while (temp > 0);
-        while (bufferIdx > 0) {
-            resultStr[idx++] = buffer[--bufferIdx];
-        }
-        resultStr[idx] = '\0';
+        snprintf(resultStr, bufferSize, "%d", result);
 
         for (int j = 0; j < bufferSize; ++j) {
             input[leftmost][j] = resultStr[j];
@@ -720,6 +729,7 @@ void paraSearch(char input[][bufferSize]) {
         }
     }
 }
+
 
 
 /*int solve(char input[][bufferSize]) {
@@ -936,6 +946,8 @@ int solve(char input[][bufferSize]) {
 
 
 
+
+
 int main(){
 
     char input[bufferSize] = { ' ' } ;
@@ -975,7 +987,8 @@ int main(){
         else {
             divideByZero = false;
         }
-        if (true);
+        if (true)
+        ;
 
     }
 
