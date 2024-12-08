@@ -846,53 +846,34 @@ int solve(char input[][bufferSize]) {
         }
     }
 
-    // Helper function to check if a value is floating-point
-    auto isFloatingPoint = [](char str[]) -> bool {
-        for (int i = 0; str[i] != '\0'; ++i) {
-            if (str[i] == '.') return true;
-        }
-        return false;
-    };
-
-    // Helper function to parse values dynamically
-    auto parseValue = [&](char str[]) -> double {
-        if (isFloatingPoint(str)) {
-            return charToFloat(str);
+    // Helper function to convert values to strings for arithmetic functions
+    auto convertToString = [](double value, char str[]) {
+        if (value == (int)value) {
+            intToChar((int)value, str);
         } else {
-            return charToInt(str);
-        }
-    };
-
-    // Helper function to convert results dynamically
-    auto formatResult = [&](double result, char output[]) {
-        if (result == (int)result) {
-            intToChar((int)result, output);
-        } else {
-            floatToChar(result, output);
-        }
-    };
-
-    // Helper function to update input array after operations
-    auto updateInputArray = [&](int index, double result) {
-        char resultStr[bufferSize];
-        formatResult(result, resultStr);
-        for (int j = 0; j < bufferSize; ++j) {
-            input[index - 1][j] = resultStr[j];
-        }
-        for (int k = index; k < bufferSize - 2; ++k) {
-            for (int j = 0; j < bufferSize; ++j) {
-                input[k][j] = input[k + 2][j];
-            }
+            floatToChar(value, str);
         }
     };
 
     // Handle exponentiation (** operator)
     for (int i = 0; i < bufferSize && input[i][0] != '\0'; ++i) {
         if (input[i][0] == '*' && input[i][1] == '*' && input[i][2] == '\0') {
-            double base = parseValue(input[i - 1]);
-            double exp = parseValue(input[i + 1]);
-            double result = power(base, exp);
-            updateInputArray(i, result);
+            char resultStr[bufferSize];
+            char leftStr[bufferSize], rightStr[bufferSize];
+
+            double base = charToFloat(input[i - 1]);
+            double exp = charToFloat(input[i + 1]);
+
+            convertToString(base, leftStr);
+            convertToString(exp, rightStr);
+
+            int result = power(leftStr, rightStr); // Use existing function
+            intToChar(result, resultStr);
+
+            strcpy(input[i - 1], resultStr);
+            for (int k = i; k < bufferSize - 2; ++k) {
+                strcpy(input[k], input[k + 2]);
+            }
             i -= 1;
         }
     }
@@ -900,19 +881,29 @@ int solve(char input[][bufferSize]) {
     // Handle multiplication, division, and modulo
     for (int i = 0; i < bufferSize && input[i][0] != '\0'; ++i) {
         if (input[i][0] == '*' || input[i][0] == '/' || input[i][0] == '%') {
-            double lhs = parseValue(input[i - 1]);
-            double rhs = parseValue(input[i + 1]);
-            double result = 0;
+            char resultStr[bufferSize];
+            char leftStr[bufferSize], rightStr[bufferSize];
 
+            double lhs = charToFloat(input[i - 1]);
+            double rhs = charToFloat(input[i + 1]);
+
+            convertToString(lhs, leftStr);
+            convertToString(rhs, rightStr);
+
+            int result = 0;
             if (input[i][0] == '*') {
-                result = multiply(lhs, rhs);
+                result = multiply(leftStr, rightStr);
             } else if (input[i][0] == '/') {
-                result = divide(lhs, rhs);
+                result = divide(leftStr, rightStr);
             } else if (input[i][0] == '%') {
-                result = modulo((int)lhs, (int)rhs); // Modulo works only for integers
+                result = modulo(leftStr, rightStr);
             }
 
-            updateInputArray(i, result);
+            intToChar(result, resultStr);
+            strcpy(input[i - 1], resultStr);
+            for (int k = i; k < bufferSize - 2; ++k) {
+                strcpy(input[k], input[k + 2]);
+            }
             i -= 1;
         }
     }
@@ -920,29 +911,34 @@ int solve(char input[][bufferSize]) {
     // Handle addition and subtraction
     for (int i = 0; i < bufferSize && input[i][0] != '\0'; ++i) {
         if (input[i][0] == '+' || input[i][0] == '-') {
-            double lhs = parseValue(input[i - 1]);
-            double rhs = parseValue(input[i + 1]);
-            double result = 0;
+            char resultStr[bufferSize];
+            char leftStr[bufferSize], rightStr[bufferSize];
 
+            double lhs = charToFloat(input[i - 1]);
+            double rhs = charToFloat(input[i + 1]);
+
+            convertToString(lhs, leftStr);
+            convertToString(rhs, rightStr);
+
+            int result = 0;
             if (input[i][0] == '+') {
-                result = add(lhs, rhs);
+                result = add(leftStr, rightStr);
             } else if (input[i][0] == '-') {
-                result = subtract(lhs, rhs);
+                result = subtract(leftStr, rightStr);
             }
 
-            updateInputArray(i, result);
+            intToChar(result, resultStr);
+            strcpy(input[i - 1], resultStr);
+            for (int k = i; k < bufferSize - 2; ++k) {
+                strcpy(input[k], input[k + 2]);
+            }
             i -= 1;
         }
     }
 
-    // Return the final result as an integer or float
-    if (isFloatingPoint(input[0])) {
-        return (int)charToFloat(input[0]); // Convert to int for compatibility
-    } else {
-        return charToInt(input[0]);
-    }
+    // Return the final result as an integer
+    return charToInt(input[0]);
 }
-
 
 
 
