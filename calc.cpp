@@ -6,9 +6,13 @@
 //no decimal support
 
 #include <iostream>
+#include <iostream>
+#include <cstring>
+#include <cctype>
+#include <cmath>
 using namespace std;
 
-const int bufferSize = 30;
+const int bufferSize = 256;
 bool divideByZero = false;
 
 //this function will get the input
@@ -37,21 +41,16 @@ void getInput(char input[]) {
 //remove all blank spaces from an array
 //input char[]
 //output char[]
-void removeBlank(char input[]) {
-    int blanksRemoved = 0;
-
-    for (int i = 0; i < bufferSize; ++i) {
-        input[i - blanksRemoved] = input[i];
-        if (input[i] == 0 || input[i] == '\0' || input[i] == ' ' || input[i] == 32) {
-            blanksRemoved++;
+// Function to remove blanks from a string
+void removeBlank(char* str) {
+    int i = 0, j = 0;
+    while (str[i]) {
+        if (!isspace(str[i])) {
+            str[j++] = str[i];
         }
+        i++;
     }
-    for (int i = bufferSize - blanksRemoved; i < bufferSize; ++i) {
-        input[i] = 0;
-
-    }
-    // Null-terminate the resulting string
-    //input[bufferSize- blanksRemoved-1] = '\0';
+    str[j] = '\0'; // Null-terminate
 }
 
 
